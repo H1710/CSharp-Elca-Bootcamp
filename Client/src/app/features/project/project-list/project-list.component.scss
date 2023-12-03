@@ -1,0 +1,135 @@
+.dialog-container {
+  .confirmation-dialog-content {
+    padding: 20px;
+    text-align: center;
+  }
+
+  .confirmation-buttons {
+    margin-top: 20px;
+  }
+
+  .p-button {
+    margin-right: 10px;
+  }
+
+  .p-button-danger {
+    background-color: #d9534f;
+    border-color: #d9534f;
+  }
+}
+
+form {
+  width: 100%;
+  display: flex;
+  height: 38px;
+  margin-bottom: 20px;
+  gap: 40px;
+  div {
+    height: 100%;
+    display: flex;
+    gap: 10px;
+    input {
+      height: 100%;
+      outline: none;
+      padding: 0 10px;
+      width: 400px;
+    }
+  }
+  button {
+    height: 100%;
+    border: none;
+    padding: 0 20px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .search-btn {
+    background-color: #2f85fa;
+    color: white;
+  }
+  .search-btn:hover {
+    background-color: #1f77f2;
+  }
+  .reset-btn {
+    background-color: transparent;
+    color: #2f85fa;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+.table-container {
+  //   position: relative;
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #ccc;
+    thead {
+      height: 30px;
+      tr {
+        th {
+          padding: 12px;
+          border: 1px solid #ccc;
+          color: #777777;
+          font-weight: 600;
+        }
+        .number {
+          text-align: right;
+        }
+        .text {
+          text-align: left;
+        }
+
+        .icon,
+        .date {
+          text-align: center;
+          svg {
+            width: 20px;
+            height: 20px;
+          }
+        }
+      }
+    }
+
+    tbody {
+      tr {
+        td {
+          border-left: 1px solid #ccc;
+          border-right: 1px solid #ccc;
+          color: #666666;
+          font-weight: 600;
+          padding: 12px;
+        }
+        .checkbox {
+          text-align: center;
+          input {
+            width: 16px;
+            height: 16px;
+          }
+        }
+        .number {
+          text-align: right;
+          cursor: pointer;
+        }
+        .text {
+          text-align: left;
+        }
+        .icon,
+        .date {
+          text-align: center;
+          svg {
+            width: 20px;
+            height: 20px;
+          }
+        }
+        .icon {
+          svg {
+            cursor: pointer;
+          }
+        }
+      }
+    }
+  }
+}
