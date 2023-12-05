@@ -6,7 +6,12 @@ import { ProjectListComponent } from './features/project/project-list/project-li
 import { CreateProjectComponent } from './features/project/add-edit-project/add-edit-project.component';
 
 const routes: Routes = [
-  { path: '', component: LoginComponent },
+  // { path: '', component: LoginComponent },
+  {
+    path: '',
+    redirectTo: 'home',
+    pathMatch: 'full',
+  },
   {
     path: 'home',
     component: HomeComponent,
