@@ -5,4 +5,5 @@ export interface Project {
   status: string;
   startDate: Date;
   endDate: Date;
+  checked?: boolean;
 }

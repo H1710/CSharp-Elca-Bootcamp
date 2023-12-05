@@ -26,7 +26,7 @@ namespace PIMTool.Core.Domain.Entities
 
         [Required]
         public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
 
         [Required]
         public int Version { get; set; }

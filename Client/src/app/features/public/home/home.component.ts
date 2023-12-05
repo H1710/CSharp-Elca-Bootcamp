@@ -17,11 +17,8 @@ export class HomeComponent {
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe(() => {
         const part = this.router.url.split('/');
-        console.log(part);
         this.action = part[3];
         this.title = part[2];
-
-        console.log(this.action, this.title);
       });
   }
 }

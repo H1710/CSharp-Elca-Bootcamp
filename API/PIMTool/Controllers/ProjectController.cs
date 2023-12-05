@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using PIMTool.Core.Domain.Entities;
@@ -41,7 +42,13 @@ namespace PIMTool.Controllers
             {
                 Group group = await _groupService.GetAsync(request.GroupId);
 
-                Project project = new Project
+                Project project = await _projectService.GetByProjectNumber(request.ProjectNumber);
+                if(project != null)
+                {
+                    throw new BusinessException($"Project number already exist");
+                }
+
+                project = new Project
                 {
                     ProjectNumber = request.ProjectNumber,
                     Name = request.Name,
@@ -65,7 +72,7 @@ namespace PIMTool.Controllers
                 await _projectService.AddAsync(project);
                 await _projectService.SaveChangesAsync();
 
-                return Ok(group);
+                return Ok(project);
             }
             catch (BusinessException ex)
             {
@@ -75,6 +82,71 @@ namespace PIMTool.Controllers
             {
                 return StatusCode(500, "Something went wrong");
             }
+
+        }
+
+        [HttpPost("auto")]
+        public async Task<IActionResult> AutoCreateProject()
+        {
+
+            for (int i = 6; i < 100; i++)
+            {
+                try
+                {
+                    CreateProjectRequestDto request = new CreateProjectRequestDto
+                    {
+                        ProjectNumber = i,
+                        Name = "Project " + i.ToString(),
+                        Customer = "Customer " + i.ToString(),
+                        Status = "NEW",
+                        GroupId = 1,
+                        Members = new List<int> { 1, 2 },
+                        StartDate = DateTime.Parse("2023-12-05"),
+                        EndDate = DateTime.Parse("2023-12-05")
+                    };
+
+                    Group group = await _groupService.GetAsync(request.GroupId);
+
+                    Project project = await _projectService.GetByProjectNumber(request.ProjectNumber);
+                    if (project != null)
+                    {
+                        throw new BusinessException($"Project number already exist");
+                    }
+
+                    project = new Project
+                    {
+                        ProjectNumber = request.ProjectNumber,
+                        Name = request.Name,
+                        Customer = request.Customer,
+                        Group = group,
+                        StartDate = request.StartDate,
+                        EndDate = request.EndDate,
+                        Status = request.Status,
+                    };
+
+                    foreach (var employeeId in request.Members)
+                    {
+                        Employee employee = await _employeeService.GetAsync(employeeId);
+                        if (employee.GroupId != request.GroupId)
+                        {
+                            throw new Exception($"An employee does not belong to group ${request.GroupId}");
+                        }
+                        project.ProjectEmployees.Add(new ProjectEmployee { Employee = employee, Project = project });
+                    }
+
+                    await _projectService.AddAsync(project);
+                    await _projectService.SaveChangesAsync();
+                }
+                catch (BusinessException ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, "Something went wrong");
+                }
+            }
+            return Ok();
 
         }
 
@@ -124,22 +196,23 @@ namespace PIMTool.Controllers
             }
         }
 
-        [HttpGet("get-all")]
-        public async Task<ActionResult<List<ProjectDto>>> GetAllGroup()
+        [HttpGet]
+        public IActionResult Get([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
         {
-            var projects = Task.Run(() => _projectService.Get().Select(
-                p => new ProjectDto
-                {
-                    Id = p.Id,
-                    ProjectNumber = p.ProjectNumber,
-                    Name = p.Name,
-                    Customer = p.Customer,
-                    Status = p.Status,
-                    StartDate = p.StartDate,
-                    EndDate = p.EndDate,
-                }
-           )).Result;
+            var queryableSource = _projectService.Get().Select(
+               p => new ProjectDto
+               {
+                   Id = p.Id,
+                   ProjectNumber = p.ProjectNumber,
+                   Name = p.Name,
+                   Customer = p.Customer,
+                   Status = p.Status,
+                   StartDate = p.StartDate,
+                   EndDate = p.EndDate,
+               });
 
+            PageList<ProjectDto> projects = PageList<ProjectDto>.ToPagedList(queryableSource, pageNumber, pageSize);
+            Debug.WriteLine(projects);
             return Ok(projects);
         }
 
@@ -190,6 +263,38 @@ namespace PIMTool.Controllers
             };
 
             return Ok(projectDto);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteProjects([FromQuery] int[] projectNumbers)
+        {
+            try
+            {
+                if (projectNumbers == null || projectNumbers.Length == 0)
+                {
+                    return BadRequest("No project IDs provided for deletion.");
+                }
+
+                List<Project> projects = new List<Project>();
+                foreach (int projectNumber in projectNumbers)
+                {
+                    var project = await _projectService.GetByProjectNumber(projectNumber);
+                    if (project == null)
+                    {
+                        return NotFound($"Project with number {projectNumber} not found.");
+                    }
+
+                    projects.Add(project);
+                }
+
+                await _projectService.DeleteProjects(projects.ToArray());
+                await _projectService.SaveChangesAsync();
+                return Ok(projects);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
     }
 }

@@ -42,11 +42,6 @@ namespace PIMTool.Database
                     .WithMany(g => g.Projects)
                     .HasForeignKey(p => p.GroupId)
                     .OnDelete(DeleteBehavior.Restrict);
-
-                e.HasMany(p => p.ProjectEmployees)
-                    .WithOne(pe => pe.Project)
-                    .HasForeignKey(pe => pe.ProjectId)
-                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<ProjectEmployee>(e =>
@@ -57,7 +52,7 @@ namespace PIMTool.Database
                 e.HasOne(pe => pe.Project)
                     .WithMany(p => p.ProjectEmployees)
                     .HasForeignKey(pe => pe.ProjectId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.Cascade);
 
                 e.HasOne(pe => pe.Employee)
                     .WithMany(e => e.ProjectEmployees)

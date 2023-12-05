@@ -45,5 +45,10 @@ namespace PIMTool.Services
         {
             return await _repository.GetByProjectNumber(projectNumber);
         }
+
+        public async Task DeleteProjects(Project[] projects)
+        {
+            _repository.Delete(projects);
+        }
     }
 }

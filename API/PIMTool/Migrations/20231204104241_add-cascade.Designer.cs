@@ -12,8 +12,8 @@ using PIMTool.Database;
 namespace PIMTool.Migrations
 {
     [DbContext(typeof(PimContext))]
-    [Migration("20231203162004_update cascade project")]
-    partial class updatecascadeproject
+    [Migration("20231204104241_add-cascade")]
+    partial class addcascade
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -174,7 +174,7 @@ namespace PIMTool.Migrations
                     b.HasOne("PIMTool.Core.Domain.Entities.Project", "Project")
                         .WithMany("ProjectEmployees")
                         .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Employee");

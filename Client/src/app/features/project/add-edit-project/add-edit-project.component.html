@@ -2,6 +2,9 @@
   <div class="fill-form-message" *ngIf="!isFillForm">
     <span>Please enter all mandatory field (*)</span>
   </div>
+  <div class="fill-form-message" *ngIf="!isDateRangeValid">
+    <span>End date must be more than start date</span>
+  </div>
   <form [formGroup]="formCreateProject" (ngSubmit)="onFormSubmit()">
     <div class="input-container">
       <div class="input-title">
@@ -11,12 +14,12 @@
 
       <div class="input-user">
         <input
+          [readonly]="!isAddMode"
           id="projectNumber"
           name="projectNumber"
           type="number"
           formControlName="projectNumber"
           min="1"
-          readonly="{{ !isAddMode }}"
         />
         <small
           class="error-message"
@@ -163,10 +166,10 @@
         </div>
       </div>
     </div>
-
-    <hr />
     <div class="btn-container">
-      <button class="cancel-btn">Cancel</button>
+      <button class="cancel-btn" type="button" (click)="cancel()">
+        Cancel
+      </button>
       <button class="create-btn" type="submit">
         {{ isAddMode ? "Create project" : "Update project" }}
       </button>

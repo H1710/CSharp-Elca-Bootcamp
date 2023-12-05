@@ -18,6 +18,7 @@ import { CreateProjectComponent } from './features/project/add-edit-project/add-
 import { DropdownModule } from 'primeng/dropdown';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { DialogModule } from 'primeng/dialog';
+import { PaginatorModule } from 'primeng/paginator';
 @NgModule({
   declarations: [AppComponent, LoginComponent, HomeComponent],
   imports: [
@@ -36,6 +37,7 @@ import { DialogModule } from 'primeng/dialog';
     ProjectListComponent,
     CreateProjectComponent,
     DialogModule,
+    PaginatorModule,
   ],
   providers: [MessageService],
   bootstrap: [AppComponent],

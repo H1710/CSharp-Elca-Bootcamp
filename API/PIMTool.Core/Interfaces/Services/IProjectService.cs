@@ -15,5 +15,7 @@ namespace PIMTool.Core.Interfaces.Services
         IEnumerable<Project> SearchProjectByProjectNumberOrNameOrCustomerAndStatus(string searchValue, string status, CancellationToken cancellationToken = default);
 
         Task<Project> GetByProjectNumber(int projectNumber, CancellationToken cancellationToken = default);
+        Task DeleteProjects(Project[] projects);
+
     }
 }
