@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { LoginRequest } from '../models/login-request.model';
 import { Observable } from 'rxjs';
@@ -14,7 +14,12 @@ export class AuthService {
   Login(model: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(
       `${environment.apiBaseUrl}/auth/login`,
-      model
+      model,
+      {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+      }
     );
   }
 }
