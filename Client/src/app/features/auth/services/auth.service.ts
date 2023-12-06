@@ -14,7 +14,7 @@ export class AuthService {
   Login(model: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(
       `${environment.apiBaseUrl}/auth/login`,
-      model,
+      JSON.stringify(model),
       {
         headers: new HttpHeaders({
           'Content-Type': 'application/json',
