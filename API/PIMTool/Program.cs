@@ -48,7 +48,12 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
 app.UseHttpsRedirection();
-app.UseCors();
+
+app.UseCors(builder =>
+builder.WithOrigins("https://pimtool-client.onrender.com")
+.AllowAnyHeader()
+.AllowCredentials()
+.AllowAnyMethod());
 
 app.MapControllers();
 
