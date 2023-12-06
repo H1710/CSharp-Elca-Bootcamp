@@ -1,3 +1,3 @@
 export const environment = {
-  apiBaseUrl: 'https://pimtoolapi.azure-api.net',
+  apiBaseUrl: 'https://localhost:7099',
 };

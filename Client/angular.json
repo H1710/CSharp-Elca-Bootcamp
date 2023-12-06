@@ -56,6 +56,20 @@
                   "with": "src/environments/environment.development.ts"
                 }
               ]
+            },
+            "staging": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.staging.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -68,6 +82,9 @@
             },
             "development": {
               "buildTarget": "pim-tool-client:build:development"
+            },
+            "staging": {
+              "buildTarget": "pim-tool-client:build:staging"
             }
           },
           "defaultConfiguration": "development"
