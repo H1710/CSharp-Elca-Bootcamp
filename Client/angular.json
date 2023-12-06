@@ -57,7 +57,7 @@
                 }
               ]
             },
-            "staging": {
+            "deployment": {
               "buildOptimizer": false,
               "optimization": false,
               "vendorChunk": true,
@@ -67,7 +67,7 @@
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.staging.ts"
+                  "with": "src/environments/environment.deployment.ts"
                 }
               ]
             }
@@ -83,8 +83,8 @@
             "development": {
               "buildTarget": "pim-tool-client:build:development"
             },
-            "staging": {
-              "buildTarget": "pim-tool-client:build:staging"
+            "deployment": {
+              "buildTarget": "pim-tool-client:build:deployment"
             }
           },
           "defaultConfiguration": "development"
