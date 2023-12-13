@@ -13,6 +13,11 @@ export class HomeComponent {
   title: string = 'project';
   action: string = 'list';
   constructor(private router: Router) {
+    const logged = localStorage.getItem('pimtool-logged') == 'logged';
+    console.log(localStorage.getItem('pimtool-logged'));
+    if (!logged) {
+      this.router.navigateByUrl('/');
+    }
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe(() => {

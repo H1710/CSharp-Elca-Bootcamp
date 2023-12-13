@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Project } from '../models/project.model';
 import { ProjectService } from '../services/project.service';
@@ -9,7 +9,7 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
-import { PaginatorModule } from 'primeng/paginator';
+import { Paginator, PaginatorModule } from 'primeng/paginator';
 import {
   ActivatedRoute,
   Params,
@@ -22,6 +22,18 @@ import { ButtonModule } from 'primeng/button';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { DeleteDialogComponent } from 'src/app/components/delete-dialog/delete-dialog.component';
 import { switchMap } from 'rxjs';
+import { GlobalState } from 'src/app/SearchValueRx/global-state.model';
+import { Store } from '@ngrx/store';
+import {
+  selectSearchValue,
+  selectStatus,
+} from 'src/app/SearchValueRx/global-state.selectors';
+import {
+  setSearchValue,
+  setStatus,
+} from 'src/app/SearchValueRx/global-state.action';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+
 @Component({
   selector: 'app-project-list',
   standalone: true,
@@ -35,6 +47,7 @@ import { switchMap } from 'rxjs';
     DialogModule,
     ButtonModule,
     PaginatorModule,
+    TranslateModule,
   ],
   providers: [DialogService],
   templateUrl: './project-list.component.html',
@@ -54,17 +67,29 @@ export class ProjectListComponent implements OnInit {
     private projectService: ProjectService,
     private fb: FormBuilder,
     public dialogService: DialogService,
-    private route: ActivatedRoute,
-    private router: Router
+    private store: Store<{ globalState: GlobalState }>,
+    private translateService: TranslateService
   ) {
     this.searchForm = this.fb.group({
-      searchValue: '',
-      status: '',
+      searchValue: [''],
+      status: [''],
     });
   }
   ngOnInit(): void {
+    this.store.select(selectSearchValue).subscribe((searchValue) => {
+      this.searchForm.patchValue({ searchValue });
+    });
+
+    this.store.select(selectStatus).subscribe((status) => {
+      this.searchForm.patchValue({ status });
+    });
     this.projectService
-      .GetAllProject(this.page, this.pageSize)
+      .SearchProject(
+        this.searchForm.value.searchValue,
+        this.searchForm.value.status,
+        this.page,
+        this.pageSize
+      )
       .subscribe((data) => {
         this.projectList = data.items;
         this.totalProject = data.totalCount;
@@ -80,7 +105,10 @@ export class ProjectListComponent implements OnInit {
   };
 
   statusList: any[] = [
-    { name: '-- None --', value: '' },
+    {
+      name: '-- None --',
+      value: '',
+    },
     { name: 'New', value: 'NEW' },
     { name: 'Planned', value: 'PLA' },
     { name: 'In progress', value: 'INP' },
@@ -96,21 +124,49 @@ export class ProjectListComponent implements OnInit {
   }
 
   onFormSubmit() {
+    this.store.dispatch(
+      setSearchValue({
+        searchValue: this.searchForm.value.searchValue,
+      })
+    );
+    this.store.dispatch(setStatus({ status: this.searchForm.value.status }));
     this.projectService
       .SearchProject(
         this.searchForm.value.searchValue,
-        this.searchForm.value.status
+        this.searchForm.value.status,
+        this.page,
+        this.pageSize
       )
       .subscribe((data) => {
-        this.projectList = data;
+        this.projectList = data.items;
+        this.totalProject = data.totalCount;
+        this.pageSize = data.pageSize;
       });
   }
 
   resetSearch() {
+    this.store.dispatch(
+      setSearchValue({
+        searchValue: '',
+      })
+    );
+    this.store.dispatch(setStatus({ status: '' }));
+    this.searchForm.patchValue({
+      searchValue: '',
+      status: '',
+    });
+    this.page = 1;
     this.projectService
-      .GetAllProject(this.page, this.pageSize)
+      .SearchProject(
+        this.searchForm.value.searchValue,
+        this.searchForm.value.status,
+        this.page,
+        this.pageSize
+      )
       .subscribe((data) => {
         this.projectList = data.items;
+        this.totalProject = data.totalCount;
+        this.pageSize = data.pageSize;
       });
   }
 
@@ -120,7 +176,6 @@ export class ProjectListComponent implements OnInit {
 
   showDialog(projectNumber: number[]) {
     this.dialogRef = this.dialogService.open(DeleteDialogComponent, {
-      header: 'Confirm delete project',
       width: '40%',
       contentStyle: { overflow: 'auto' },
       baseZIndex: 10000,
@@ -147,7 +202,12 @@ export class ProjectListComponent implements OnInit {
   onPageChange(event: any) {
     this.page = event.page + 1;
     this.projectService
-      .GetAllProject(this.page, this.pageSize)
+      .SearchProject(
+        this.searchForm.value.searchValue,
+        this.searchForm.value.status,
+        this.page,
+        this.pageSize
+      )
       .subscribe((data) => {
         this.projectList = data.items;
         this.totalProject = data.totalCount;
@@ -162,5 +222,11 @@ export class ProjectListComponent implements OnInit {
     this.checkedDeleteProject = deleteProjects.map(
       (project) => project.projectNumber
     );
+  }
+
+  getTranslatedStatusListPlaceholder(): string {
+    const translatedProject = this.translateService.instant('project');
+    const translatedStatus = this.translateService.instant('status');
+    return `${translatedProject} ${translatedStatus}`;
   }
 }

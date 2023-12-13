@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using PIMTool.Core.Domain.Entities;
+using PIMTool.Core.Domain.Objects;
 using PIMTool.Dtos;
 
 namespace PIMTool.MappingProfiles
@@ -9,6 +10,11 @@ namespace PIMTool.MappingProfiles
         public ProjectAutoMapperProfile()
         {
             CreateMap<Project, ProjectDto>();
+            CreateMap<Project, CreateProjectRequestDto>()
+                .ForMember(dest => dest.Members, opt => opt.MapFrom(src => src.ProjectEmployees.Select(pe => pe.EmployeeId).ToList()));
+            CreateMap<CreateProjectRequestDto, Project>();
+            CreateMap<PageList<Project>, PageList<ProjectDto>>()
+                            .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
         }
     }
 }

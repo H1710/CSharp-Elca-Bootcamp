@@ -24,6 +24,10 @@ export class LoginComponent implements OnDestroy {
     private messageService: MessageService,
     private router: Router
   ) {
+    const logged = localStorage.getItem('pimtool-logged') === 'logged';
+    if (logged) {
+      this.router.navigateByUrl('/home');
+    }
     this.loginForm = this.fb.group({
       username: ['Admin', Validators.required],
       password: ['1', Validators.required],
@@ -49,7 +53,7 @@ export class LoginComponent implements OnDestroy {
               summary: 'Success',
               detail: response.message,
             });
-
+            localStorage.setItem('pimtool-logged', 'logged');
             this.router.navigateByUrl('/home');
           },
           error: (err) => {

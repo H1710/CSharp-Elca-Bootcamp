@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Data;
 using System.Diagnostics;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using PIMTool.Core.Domain.Entities;
+using PIMTool.Core.Domain.Objects;
 using PIMTool.Core.Exceptions;
 using PIMTool.Core.Interfaces.Services;
 using PIMTool.Dtos;
@@ -40,39 +42,13 @@ namespace PIMTool.Controllers
         {
             try
             {
-                Group group = await _groupService.GetAsync(request.GroupId);
+                Project newProject = _mapper.Map<Project>(request);
+                List<int> employeeIds = request.Members;
+                
 
-                Project project = await _projectService.GetByProjectNumber(request.ProjectNumber);
-                if(project != null)
-                {
-                    throw new BusinessException($"Project number already exist");
-                }
+                await _projectService.AddAsync(newProject, employeeIds);
 
-                project = new Project
-                {
-                    ProjectNumber = request.ProjectNumber,
-                    Name = request.Name,
-                    Customer = request.Customer,
-                    Group = group,
-                    StartDate = request.StartDate,
-                    EndDate = request.EndDate,
-                    Status = request.Status,
-                };
-
-                foreach (var employeeId in request.Members)
-                {
-                    Employee employee = await _employeeService.GetAsync(employeeId);
-                    if(employee.GroupId != request.GroupId)
-                    {
-                        throw new Exception($"An employee does not belong to group ${request.GroupId}");
-                    }
-                    project.ProjectEmployees.Add(new ProjectEmployee { Employee = employee, Project = project });
-                }
-
-                await _projectService.AddAsync(project);
-                await _projectService.SaveChangesAsync();
-
-                return Ok(project);
+                return Ok(newProject);
             }
             catch (BusinessException ex)
             {
@@ -89,7 +65,7 @@ namespace PIMTool.Controllers
         public async Task<IActionResult> AutoCreateProject()
         {
 
-            for (int i = 6; i < 100; i++)
+            for (int i = 1; i < 100; i++)
             {
                 try
                 {
@@ -134,7 +110,7 @@ namespace PIMTool.Controllers
                         project.ProjectEmployees.Add(new ProjectEmployee { Employee = employee, Project = project });
                     }
 
-                    await _projectService.AddAsync(project);
+                   /* await _projectService.AddAsync(project);*/
                     await _projectService.SaveChangesAsync();
                 }
                 catch (BusinessException ex)
@@ -155,23 +131,7 @@ namespace PIMTool.Controllers
         {
             try
             {
-                Project existingProject = await _projectService.GetByProjectNumber(projectNumber);
-                if (existingProject == null)
-                {
-                    return NotFound($"Project {projectNumber} not found.");
-                }
-
-                existingProject.ProjectNumber = request.ProjectNumber;
-                existingProject.Name = request.Name;
-                existingProject.Customer = request.Customer;
-                existingProject.StartDate = request.StartDate;
-                existingProject.EndDate = request.EndDate;
-                existingProject.Status = request.Status;
-
-                Group group = await _groupService.GetAsync(request.GroupId);
-                existingProject.Group = group;
-
-                existingProject.ProjectEmployees.Clear();
+                Project newProject = _mapper.Map<Project>(request);
                 foreach (var employeeId in request.Members)
                 {
                     Employee employee = await _employeeService.GetAsync(employeeId);
@@ -179,13 +139,55 @@ namespace PIMTool.Controllers
                     {
                         throw new BusinessException($"An employee does not belong to the group of the existing project.");
                     }
-                    existingProject.ProjectEmployees.Add(new ProjectEmployee { Employee = employee, Project = existingProject });
+
+                    newProject.ProjectEmployees.Add(new ProjectEmployee { Employee = employee, Project = newProject });
                 }
+                await _projectService.UpdateProject(projectNumber, newProject);
 
-                await _projectService.SaveChangesAsync();
 
-                return Ok(existingProject);
+                return Ok();
             }
+            catch (BusinessException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ProjectDto>>> Get([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
+        {
+            PageList<Project> projects = await _projectService.Get(pageNumber, pageSize);
+            PageList<ProjectDto> projectDtos = _mapper.Map<PageList<ProjectDto>>(projects);
+            return Ok(projectDtos);
+        }
+
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<Project>>> SearchProjectByNameAndStatus(
+            [FromQuery] string? searchValue,
+            [FromQuery] string? status,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 5)
+        {
+            PageList<Project> projects = await _projectService.SearchProjectByProjectNumberOrNameOrCustomerAndStatus(searchValue, status, pageNumber, pageSize);
+            PageList<ProjectDto> projectDtos = _mapper.Map<PageList<ProjectDto>>(projects);
+            return Ok(projectDtos);
+        }
+
+        [HttpGet("get-by-project-num/{projectNumber}")]
+        public async Task<ActionResult<CreateProjectRequestDto>> GetByProjectNumber(int projectNumber)
+        {
+            try
+            {
+                var project = await _projectService.GetByProjectNumber(projectNumber);
+
+                var projectDto = _mapper.Map<CreateProjectRequestDto>(project);
+
+                return Ok(projectDto);
+            } 
             catch (BusinessException ex)
             {
                 return BadRequest(ex.Message);
@@ -196,105 +198,20 @@ namespace PIMTool.Controllers
             }
         }
 
-        [HttpGet]
-        public IActionResult Get([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
-        {
-            var queryableSource = _projectService.Get().Select(
-               p => new ProjectDto
-               {
-                   Id = p.Id,
-                   ProjectNumber = p.ProjectNumber,
-                   Name = p.Name,
-                   Customer = p.Customer,
-                   Status = p.Status,
-                   StartDate = p.StartDate,
-                   EndDate = p.EndDate,
-               });
-
-            PageList<ProjectDto> projects = PageList<ProjectDto>.ToPagedList(queryableSource, pageNumber, pageSize);
-            Debug.WriteLine(projects);
-            return Ok(projects);
-        }
-
-        [HttpGet("search")]
-        public ActionResult<IEnumerable<Project>> SearchProjectByNameAndStatus([FromQuery] string? searchValue, [FromQuery] string? status)
-        {
-            var projects = _projectService.SearchProjectByProjectNumberOrNameOrCustomerAndStatus(searchValue, status).Select(
-                p => new ProjectDto
-                {
-                    Id = p.Id,
-                    ProjectNumber = p.ProjectNumber,
-                    Name = p.Name,
-                    Customer = p.Customer,
-                    Status = p.Status,
-                    StartDate = p.StartDate,
-                    EndDate = p.EndDate,
-                }
-           );
-
-            if (projects == null || !projects.Any())
-            {
-                return NotFound();
-            }
-
-            return Ok(projects);
-        }
-
-        [HttpGet("get-by-project-num/{projectNumber}")]
-        public async Task<ActionResult<CreateProjectRequestDto>> GetByProjectNumber(int projectNumber)
-        {
-            var project = await _projectService.GetByProjectNumber(projectNumber);
-
-            if (project == null)
-            {
-                return NotFound();
-            }
-
-            var projectDto = new CreateProjectRequestDto
-            {
-                ProjectNumber = project.ProjectNumber,
-                Name = project.Name,
-                Customer = project.Customer,
-                Status = project.Status,
-                StartDate = project.StartDate,
-                EndDate = project.EndDate,
-                GroupId = project.GroupId,
-                Members = project.ProjectEmployees.Select(pe => pe.EmployeeId).ToList(),
-            };
-
-            return Ok(projectDto);
-        }
-
         [HttpDelete]
         public async Task<IActionResult> DeleteProjects([FromQuery] int[] projectNumbers)
         {
             try
             {
-                if (projectNumbers == null || projectNumbers.Length == 0)
-                {
-                    return BadRequest("No project IDs provided for deletion.");
-                }
-
-                List<Project> projects = new List<Project>();
-                foreach (int projectNumber in projectNumbers)
-                {
-                    var project = await _projectService.GetByProjectNumber(projectNumber);
-                    if (project == null)
-                    {
-                        return NotFound($"Project with number {projectNumber} not found.");
-                    }
-
-                    projects.Add(project);
-                }
-
-                await _projectService.DeleteProjects(projects.ToArray());
-                await _projectService.SaveChangesAsync();
-                return Ok(projects);
+                await _projectService.DeleteProjects(projectNumbers);
+                
+                return Ok();
             }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
+
     }
 }

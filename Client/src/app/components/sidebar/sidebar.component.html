@@ -3,20 +3,24 @@
     [ngClass]="{ active: action === 'list' }"
     [routerLink]="['project/list']"
     class="title"
-    >{{ title | titlecase }} list</a
+    >{{ title | translate | titlecase }} {{ "list" | translate }}</a
   >
   <nav>
-    <h3 class="status">{{ action | titlecase }}</h3>
+    <h3 class="status">{{ action | translate | titlecase }}</h3>
     <ul>
       <li>
         <a
           [ngClass]="{ active: action === 'new' }"
           [routerLink]="['project/new']"
-          >Project</a
+          >{{ "project" | translate }}</a
         >
       </li>
-      <li><a>Customer</a></li>
-      <li><a>Supplier</a></li>
+      <li>
+        <a>{{ "customer" | translate }}</a>
+      </li>
+      <li>
+        <a>{{ "supplier" | translate }}</a>
+      </li>
     </ul>
   </nav>
 </div>

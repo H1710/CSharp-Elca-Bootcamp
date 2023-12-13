@@ -30,6 +30,11 @@
       input::-webkit-inner-spin-button {
         -webkit-appearance: none;
       }
+      .disable-input {
+        background-color: #e6e6e6;
+        outline: none;
+        border: none;
+      }
       .input-title {
         width: 160px;
         display: flex;
@@ -61,6 +66,13 @@
         .select-container {
           height: 100%;
           flex: 1;
+        }
+        .number {
+          text-align: right;
+        }
+        #projectName,
+        #customer {
+          width: 100%;
         }
       }
 
@@ -94,18 +106,15 @@
             align-items: center;
           }
           span {
-            color: rgb(141, 5, 5);
+            color: red;
           }
         }
+
         .input-user {
           flex: 1;
           // height: 100%;
           // align-items: center;
           // gap: 20px;
-          input {
-            height: 100%;
-            width: 160px;
-          }
           .error-message {
             color: rgb(141, 5, 5);
             font-weight: 600;
@@ -135,6 +144,14 @@
       .create-btn {
         background-color: #2f85fa;
         color: white;
+
+        // display: flex;
+        // align-items: center;
+        // padding: 0px 20px;
+        gap: 10px;
+        .loading {
+          position: relative;
+        }
       }
       .create-btn:hover {
         background-color: #2973db;
@@ -147,6 +164,18 @@
       .cancel-btn:hover {
         background-color: #bfbfbf;
       }
+    }
+  }
+}
+
+:host ::ng-deep {
+  .custom-calendar {
+    .p-inputtext {
+      text-align: center;
+      height: 30px;
+    }
+    .p-button {
+      height: 30px;
     }
   }
 }

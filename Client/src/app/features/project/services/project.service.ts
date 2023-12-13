@@ -22,9 +22,14 @@ export class ProjectService {
     );
   }
 
-  SearchProject(searchValue: string, status: string): Observable<Project[]> {
-    return this.http.get<Project[]>(
-      `${environment.apiBaseUrl}/project/search?searchValue=${searchValue}&status=${status}`
+  SearchProject(
+    searchValue: string,
+    status: string,
+    pageNumber: number,
+    pageSize: number
+  ): Observable<PageList> {
+    return this.http.get<PageList>(
+      `${environment.apiBaseUrl}/project/search?searchValue=${searchValue}&status=${status}&pageNumber=${pageNumber}&pageSize=${pageSize}`
     );
   }
 

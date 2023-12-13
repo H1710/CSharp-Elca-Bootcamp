@@ -5,6 +5,7 @@ export interface CreateProjectRequest {
   groupId: number;
   members: number[];
   status: string;
-  startDate: string;
-  endDate: string;
+  startDate: Date;
+  endDate: Date;
+  version?: string;
 }

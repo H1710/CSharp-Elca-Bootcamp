@@ -1,19 +1,33 @@
 <div class="header-container">
   <div class="logo-container">
     <img class="logo" src="../../../assets/images/logo_elca.png" alt="" />
-    <p class="logo-title">Project infomation management</p>
+    <p class="logo-title">{{ "title-header" | translate }}</p>
   </div>
 
   <div style="display: flex; gap: 100px">
     <div style="display: flex; align-items: center">
-      <p>EN</p>
+      <p
+        (click)="setLang('en')"
+        [ngClass]="{ 'select-language': userLang !== 'en' }"
+      >
+        EN
+      </p>
       |
-      <p>FR</p>
+      <p
+        (click)="setLang('fr')"
+        [ngClass]="{ 'select-language': userLang !== 'fr' }"
+      >
+        FR
+      </p>
     </div>
     <nav style="display: flex; align-items: center">
       <ul>
-        <li><a routerLink="/">Help</a></li>
-        <li><a routerLink="/about">Logout</a></li>
+        <li>
+          <a routerLink="/">{{ "help" | translate }}</a>
+        </li>
+        <li (click)="showDialog()" style="cursor: pointer">
+          <a routerLink="/about">{{ "logout" | translate }}</a>
+        </li>
       </ul>
     </nav>
   </div>

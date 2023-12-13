@@ -4,7 +4,9 @@
       id="search-input"
       name="search-input"
       type="text"
-      placeholder="Project number, name, customer name"
+      placeholder="{{ 'project' | translate }} {{ 'number' | translate }}, {{
+        'name' | translate
+      }}, {{ 'customer' | translate }} {{ 'name' | translate }}"
       formControlName="searchValue"
     />
 
@@ -18,8 +20,12 @@
     ></p-dropdown>
   </div>
 
-  <button type="submit" class="search-btn">Search Project</button>
-  <div (click)="resetSearch()" class="reset-btn">Reset Search</div>
+  <button type="submit" class="search-btn">
+    {{ "search" | translate }} {{ "project" | translate }}
+  </button>
+  <div (click)="resetSearch()" class="reset-btn">
+    {{ "reset" | translate }} {{ "search" | translate }}
+  </div>
 </form>
 
 <div class="table-container">
@@ -27,12 +33,12 @@
     <thead>
       <tr>
         <th></th>
-        <th class="number">Number</th>
-        <th class="text">Name</th>
-        <th class="text">Status</th>
-        <th class="text">Customer</th>
-        <th class="date">Start date</th>
-        <th class="icon">Delete</th>
+        <th class="number">{{ "number" | translate }}</th>
+        <th class="text">{{ "name" | translate }}</th>
+        <th class="text">{{ "status" | translate }}</th>
+        <th class="text">{{ "customer" | translate }}</th>
+        <th class="date">{{ "start" | translate }} {{ "date" | translate }}</th>
+        <th class="icon">{{ "delete" | translate }}</th>
       </tr>
     </thead>
     <tbody>
@@ -58,7 +64,7 @@
           {{ project.name }}
         </td>
         <td class="text">
-          {{ statusConvert[project.status] }}
+          {{ statusConvert[project.status] | translate }}
         </td>
         <td class="text">
           {{ project.customer }}
@@ -124,7 +130,8 @@
     [rows]="this.pageSize"
     [totalRecords]="this.totalProject"
     (onPageChange)="onPageChange($event)"
-    [first]="1"
+    [first]="(this.page - 1) * this.pageSize"
     [style]="{ backgroundColor: '#ffffff' }"
+    #p
   ></p-paginator>
 </div>

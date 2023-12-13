@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PIMTool.Core.Interfaces.Services;
@@ -10,6 +11,7 @@ namespace PIMTool.Controllers
 {
     [ApiController]
     [Route("auth")]
+    [EnableCors("apiCorsPolicy")]
     public class AuthenticationController : ControllerBase
     {
         private readonly IAuthenticationService _authService;

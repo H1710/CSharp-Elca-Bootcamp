@@ -6,6 +6,13 @@
   align-items: center;
   border-bottom: solid 1px #ccc;
 
+  .select-language {
+    color: blue;
+  }
+
+  .select-language:hover {
+    cursor: pointer;
+  }
   nav {
     ul {
       list-style-type: none;

@@ -8,7 +8,7 @@
     flex: 1;
     .sidebar {
       padding-top: 20px;
-      flex: 3;
+      width: 300px;
       border-right: 1px solid #ccc;
     }
 
@@ -21,8 +21,8 @@
         border-bottom: 1px solid #ccc;
         margin: 0 0 4px 0;
       }
-      padding: 20px 300px 30px 30px;
-      flex: 7;
+      padding: 20px 200px 30px 30px;
+      flex: 1;
     }
   }
 }

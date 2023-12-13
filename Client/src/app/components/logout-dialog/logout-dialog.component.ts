@@ -1,17 +1,17 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
-import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { TranslateModule } from '@ngx-translate/core';
+import { DynamicDialogRef } from 'primeng/dynamicdialog';
 
 @Component({
-  selector: 'app-delete-dialog',
+  selector: 'app-logout-dialog',
   standalone: true,
   imports: [CommonModule, ButtonModule, TranslateModule],
-  templateUrl: './delete-dialog.component.html',
-  styleUrl: './delete-dialog.component.scss',
+  templateUrl: './logout-dialog.component.html',
+  styleUrl: './logout-dialog.component.scss',
 })
-export class DeleteDialogComponent {
+export class LogoutDialogComponent {
   constructor(public ref: DynamicDialogRef) {}
 
   cancel(): void {
